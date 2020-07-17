@@ -1,2 +1,1 @@
-# SBM
-Social Business Modelling
+# News portal scraping and content modeling system
