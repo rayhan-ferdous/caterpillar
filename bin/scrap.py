@@ -3,7 +3,8 @@ from urllib.parse import urljoin
 
 baseurl = open('data/base.txt', 'r').readline()
 
-#parser
+#good for tiny elemnt mining, e.g. date of publication
+#holds order of bs4 tag matching in BFS and redundancy
 def summarize(source):
     soup = BeautifulSoup(source, 'html.parser')
 
@@ -40,6 +41,8 @@ def summarize(source):
 
     return summary
 
+#good for article mining and no redundancy
+#compromises HTML structure
 def clean_text(summary):
     #repeated substring must occur after the original string
     #in other words, parent tag holds a string and child tag only holds a substring; the child tag with substring always occurs after the parent tag
@@ -103,7 +106,8 @@ def filter_heading(summary):
 
 if __name__ == '__main__':
     source = open('data/page.html', 'r')
-    clean_summary = clean_text(summarize(source))
+    summary = summarize(source)
+    clean_summary = clean_text(summary)
 
     # filter_links(summary)
     # filter_heading(summary)
@@ -111,3 +115,8 @@ if __name__ == '__main__':
 
     for c in clean_summary:
         print(c)
+        # if 'text' in c:
+        #     para = ' '.join(c['text'])
+        #     wordcount = len(para.split(' '))
+        #     charcount = len(para)
+        #     print(wordcount, charcount, para)
