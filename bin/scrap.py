@@ -30,32 +30,64 @@ def summarize(source):
             alt = edict['alt']
             sdict['alt'] = alt
 
-        text = elem.get_text(separator='\n').split('\n')
-        fine_text = [t for t in text if t.strip() != '']
-        if len(fine_text) > 0:
-            sdict['fine_text'] = fine_text
+        text = elem.get_text(separator='~~~').split('~~~')          #separate text in the same tag with uncommon string, only stripping will still leave a lot of '\n' in the mid of string
+        text = [t.strip() for t in text if t.strip() != '']         #still text holds too many space/newline characters
+
+        if text != []:
+            sdict['text'] = text
 
         summary.append(sdict)
 
     return summary
 
-def remove_duplicates(summary):
-    pass
+def clean_text(summary):
+    #repeated substring must occur after the original string
+    #in other words, parent tag holds a string and child tag only holds a substring; the child tag with substring always occurs after the parent tag
+
+    # text_summary = [t for t in summary if 'text' in t]
+
+    for t in summary:
+        if 'text' in t:
+            t['text'] = '~~~'.join(t['text'])
+
+    #target substring
+    for i in reversed(range(len(summary))):
+        if 'text' in summary[i]:
+            # namei = summary[i]['name']
+            texti = summary[i]['text']
+
+            #duplicate holder string
+            for j in reversed(range(i)):
+                if 'text' in summary[j]:
+                    # namej = summary[j]['name']
+                    textj = summary[j]['text']
+
+                    if texti in textj:
+                        # print(j)
+                        # print(texti)
+                        # print(textj)
+                        replaced = summary[j]['text'].replace(texti, '')
+                        # print(replaced)
+                        summary[j]['text'] = replaced
+
+    for i in range(len(summary)):
+        if 'text' in summary[i]:
+            summary[i]['text'] = summary[i]['text'].split('~~~')
+            summary[i]['text'] = [t for t in summary[i]['text'] if t != '']
+            if summary[i]['text'] == []:
+                del summary[i]['text']
+
+    # for s in summary:
+    #     print(s)
+    return summary
+
 
 def filter_links(summary):
     for s in summary:
         # print(s)
-        if 'a' == s['name'] or 'href' == s['name'] or 'a' == s['name']:
+        if 'a' == s['name'] or 'href' == s['name'] or 'src' == s['name']:
             try:
                 print(s)
-            except:
-                pass
-
-def filter_text(summary):
-    for s in summary:
-        if 'p' == s['name']:
-            try:
-                print(s['name'], s['fine_text'])
             except:
                 pass
 
@@ -71,7 +103,11 @@ def filter_heading(summary):
 
 if __name__ == '__main__':
     source = open('data/page.html', 'r')
-    summary = summarize(source)
+    clean_summary = clean_text(summarize(source))
+
     # filter_links(summary)
-    # filter_text(summary)
-    filter_heading(summary)
+    # filter_heading(summary)
+
+
+    for c in clean_summary:
+        print(c)
