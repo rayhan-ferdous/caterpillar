@@ -34,6 +34,7 @@ def summarize(source):
         text = elem.get_text(separator='~~~').split('~~~')          #separate text in the same tag with uncommon string, only stripping will still leave a lot of '\n' in the mid of string
         text = [t.strip() for t in text if t.strip() != '']         #still text holds too many space/newline characters
 
+
         if text != []:
             sdict['text'] = text
 
@@ -49,9 +50,10 @@ def clean_text(summary):
 
     # text_summary = [t for t in summary if 'text' in t]
 
-    for t in summary:
-        if 'text' in t:
-            t['text'] = '~~~'.join(t['text'])
+    for i in range((len(summary))):
+        if 'text' in summary[i]:
+            summary[i]['text'] = '~~~'.join(summary[i]['text'])
+
 
     #target substring
     for i in reversed(range(len(summary))):
@@ -65,13 +67,15 @@ def clean_text(summary):
                     # namej = summary[j]['name']
                     textj = summary[j]['text']
 
-                    if texti in textj:
+                    if texti in textj and (textj.startswith('~~~') or textj.endswith('~~~')):
                         # print(j)
                         # print(texti)
                         # print(textj)
                         replaced = summary[j]['text'].replace(texti, '')
                         # print(replaced)
                         summary[j]['text'] = replaced
+
+
 
     for i in range(len(summary)):
         if 'text' in summary[i]:
@@ -115,8 +119,8 @@ if __name__ == '__main__':
 
     for c in clean_summary:
         print(c)
-        # if 'text' in c:
-        #     para = ' '.join(c['text'])
-        #     wordcount = len(para.split(' '))
-        #     charcount = len(para)
-        #     print(wordcount, charcount, para)
+        if 'text' in c and c['name'] == 'p':
+            para = ' '.join(c['text'])
+            wordcount = len(para.split(' '))
+            charcount = len(para)
+            print(wordcount, charcount, para)
